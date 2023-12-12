@@ -4,16 +4,12 @@ const APIError = require("../utils/APIError");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-// check whether each product's details
-// are valid or not.
 const productValidate = Joi.object({
     name: Joi.string().min(1).required(),
     price: Joi.number().required(),
 });
 
 const createCatalog = async (productsList, sellerId) => {
-    // This method is used to validata all
-    // the items of an array
     const { error } = Joi.array()
         .items(productValidate)
         .min(1)
@@ -21,10 +17,8 @@ const createCatalog = async (productsList, sellerId) => {
 
     if (error) throw new APIError(error.message, 400);
 
-    // get the catalog data.
     const check = await Catalog.findOne({ sellerId });
 
-    // create instances of all the products and store it in a new array
     const newProductList = productsList.map((product) => {
         return new Product({
             productName: product.name,
@@ -33,7 +27,6 @@ const createCatalog = async (productsList, sellerId) => {
         });
     });
 
-    // Insert all items from newProductList into the Products collection
     const response = await Product.create(newProductList);
 
     // Create a new array of ObjectIds of all the newly created products
@@ -41,7 +34,7 @@ const createCatalog = async (productsList, sellerId) => {
 
     // If the seller catalog is not present, then create a new one and
     // insert all the products ids into the productsList.
-
+    
     // If the seller catalog is already present, then just push all the new
     // products ids into its productsList
     if (!check) {

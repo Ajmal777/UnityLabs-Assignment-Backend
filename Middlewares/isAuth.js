@@ -17,10 +17,7 @@ module.exports = (req, res, next) => {
     }
     else{
         // Once the token is verified, it will return a payload which 
-        // is then stored in req.locals.
-        // payload may contain user info. like userId and
-        // other info. as well which can be accessed using req.locals.
-        
+        // is then stored in req.locals, which can be accessed.        
         req.locals = jwt.verify(token, process.env.JWT_KEY);
         next();
     }

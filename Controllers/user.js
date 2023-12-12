@@ -10,10 +10,6 @@ const APIError = require("../utils/APIError");
 
 const BCRYPT_SALT = Number(process.env.BCRYPT_SALT);
 
-// valdidationObj is matched against user input
-// and will throw an error in case the specified
-// conditions don't match the input values.
-
 const validationObj = Joi.object({
     username: Joi.string().min(1).max(10).required(),
     password: Joi.string().min(5).max(25).required(),
@@ -21,7 +17,6 @@ const validationObj = Joi.object({
 });
 
 const register = async (username, password, typeOfUser) => {
-    // validate user input
     const { error } = validationObj.validate({
         username,
         password,
@@ -30,7 +25,6 @@ const register = async (username, password, typeOfUser) => {
 
     if (error) throw new APIError(error.message, 400, error);
 
-    // check if the username already exists or not
     const check = await User.findOne({ username });
     if (check) {
         throw new APIError("Username already taken", 409);
@@ -39,7 +33,6 @@ const register = async (username, password, typeOfUser) => {
     // create an encrypted password
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT);
 
-    // create a new User object
     const userObj = new User({
         username,
         typeOfUser,
@@ -62,7 +55,6 @@ const login = async (username, password, typeOfUser) => {
 
     if (error) throw new APIError(error.message, 400, error);
 
-    // get the userData if it exists, else throw an error.
     const userData = await User.findOne({ typeOfUser, username });
     if (!userData) {
         throw new APIError(
@@ -71,9 +63,7 @@ const login = async (username, password, typeOfUser) => {
         );
     }
 
-    // get the encrypted password from userData and compare it with the 
-    // password from the user using bcrypt.compare().
-    // if they are same, it will return true. else it will reurn false.
+    // get the encrypted password from userData and compare it with the password 
     const verifyPassword = await bcrypt.compare(password, userData.password);
     if (!verifyPassword) {
         throw new APIError("Invalid password", 401);
@@ -94,7 +84,6 @@ const login = async (username, password, typeOfUser) => {
 };
 
 const allSellers = async () => {
-    // get all sellers
     const listOfSellers = await User.find(
         { typeOfUser: "seller" },
         { password: 0, typeOfUser: 0 }

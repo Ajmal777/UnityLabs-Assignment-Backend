@@ -4,7 +4,6 @@ const { Order } = require("../models");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 const createOrder = async (buyerId, sellerId, orderList) => {
-    // validate user input
     const { error } = Joi.object({
         buyerId: Joi.string().required(),
         sellerId: Joi.string().required(),
@@ -13,8 +12,6 @@ const createOrder = async (buyerId, sellerId, orderList) => {
 
     if (error) throw new APIError(error.message, 401);
 
-    // Create a new Order instance, insert all the products ids
-    // into the orderItems field.
     const orderObj = new Order({
         buyer: new ObjectId(buyerId),
         sellerId: new ObjectId(sellerId),
